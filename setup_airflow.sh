@@ -122,10 +122,7 @@ install_airflow() {
     log_info "Installing apache-airflow==2.7.3..."
     pip install apache-airflow==2.7.3
     
-    log_info "Installing apache-airflow-providers-python>=4.0.0..."
-    pip install "apache-airflow-providers-python>=4.0.0"
-    
-    log_success "Apache Airflow 2.7.3 installed with providers"
+    log_success "Apache Airflow 2.7.3 installed"
 }
 
 # ============================================================================

@@ -122,7 +122,11 @@ install_airflow() {
     log_info "Installing apache-airflow==2.7.3..."
     pip install apache-airflow==2.7.3
     
-    log_success "Apache Airflow 2.7.3 installed"
+    # Install missing dependencies that Airflow doesn't include by default
+    log_info "Installing required dependencies..."
+    pip install flask-session
+    
+    log_success "Apache Airflow 2.7.3 installed with all dependencies"
 }
 
 # ============================================================================

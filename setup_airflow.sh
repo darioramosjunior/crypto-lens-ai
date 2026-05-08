@@ -115,12 +115,17 @@ install_airflow() {
     log_info "Installing Apache Airflow 2.7.3..."
     
     # Upgrade pip
-    pip install --upgrade pip setuptools wheel > /dev/null 2>&1
+    pip install --upgrade pip setuptools wheel
     log_success "pip, setuptools, wheel upgraded"
     
-    # Install Airflow
-    pip install apache-airflow==2.7.3 apache-airflow-providers-python > /dev/null 2>&1
-    log_success "Apache Airflow 2.7.3 installed"
+    # Install Airflow (with visible output for debugging)
+    log_info "Installing apache-airflow==2.7.3..."
+    pip install apache-airflow==2.7.3
+    
+    log_info "Installing apache-airflow-providers-python>=4.0.0..."
+    pip install "apache-airflow-providers-python>=4.0.0"
+    
+    log_success "Apache Airflow 2.7.3 installed with providers"
 }
 
 # ============================================================================
@@ -134,9 +139,13 @@ initialize_airflow_db() {
     
     export AIRFLOW_HOME="${AIRFLOW_HOME}"
     
-    # Initialize database
-    airflow db init > /dev/null 2>&1
-    log_success "Airflow database initialized at ${AIRFLOW_HOME}"
+    # Initialize database (with visible output)
+    if airflow db init; then
+        log_success "Airflow database initialized at ${AIRFLOW_HOME}"
+    else
+        log_error "Failed to initialize Airflow database"
+        return 1
+    fi
 }
 
 create_admin_user() {
@@ -144,18 +153,18 @@ create_admin_user() {
     
     export AIRFLOW_HOME="${AIRFLOW_HOME}"
     
-    # Create admin user
-    airflow users create \
+    # Create admin user (with visible output)
+    if airflow users create \
         --username admin \
         --firstname Admin \
         --lastname User \
         --role Admin \
         --email admin@example.com \
-        --password airflow123 > /dev/null 2>&1 || {
-        log_warning "Admin user may already exist"
-    }
-    
-    log_success "Airflow admin user created (admin/airflow123)"
+        --password airflow123 2>&1; then
+        log_success "Airflow admin user created (admin/airflow123)"
+    else
+        log_warning "Admin user may already exist or creation encountered an issue"
+    fi
 }
 
 # ============================================================================

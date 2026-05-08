@@ -108,23 +108,30 @@ activate_venv() {
 }
 
 # ============================================================================
+# HELPER: Use venv python/pip directly
+# ============================================================================
+
+VENV_PIP="${VENV_DIR}/bin/pip"
+VENV_PYTHON="${VENV_DIR}/bin/python"
+
+# ============================================================================
 # AIRFLOW INSTALLATION
 # ============================================================================
 
 install_airflow() {
     log_info "Installing Apache Airflow 2.7.3..."
     
-    # Upgrade pip
-    pip install --upgrade pip setuptools wheel
+    # Upgrade pip using explicit venv path
+    ${VENV_PIP} install --upgrade pip setuptools wheel
     log_success "pip, setuptools, wheel upgraded"
     
     # Install Airflow (with visible output for debugging)
     log_info "Installing apache-airflow==2.7.3..."
-    pip install apache-airflow==2.7.3
+    ${VENV_PIP} install apache-airflow==2.7.3
     
     # Install missing dependencies that Airflow doesn't include by default
     log_info "Installing required dependencies..."
-    pip install flask-session
+    ${VENV_PIP} install flask-session
     
     log_success "Apache Airflow 2.7.3 installed with all dependencies"
 }

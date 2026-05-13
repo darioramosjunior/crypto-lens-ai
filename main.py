@@ -41,6 +41,7 @@ def main() -> int:
         "daily_fetch_and_pulse.py",
         "market_breadth.py",
         "oi_change_screener.py",
+        "ai_interpreter.py",
         "pipeline_observability.py"
     ]
     

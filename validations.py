@@ -379,3 +379,28 @@ def validate_batch_data(
         errors=errors,
         validated_count=valid_count
     )
+
+
+# ============================================================================
+# AI Interpretation Models
+# ============================================================================
+
+class AIInterpretationResponse(BaseModel):
+    """Validates AI interpretation responses from LLMs"""
+    timestamp: datetime = Field(..., description="When the interpretation was generated")
+    context: str = Field(..., max_length=100, description="Analysis context (e.g., 'hourly', 'daily')")
+    data_summary: str = Field(..., max_length=1000, description="Summary of data analyzed")
+    interpretation: str = Field(..., min_length=10, max_length=2000, description="LLM interpretation")
+    model_used: str = Field(..., description="Model name used for interpretation")
+    
+    class Config:
+        validate_assignment = True
+
+
+class AIInterpretationRequest(BaseModel):
+    """Validates AI interpretation requests"""
+    data_summary: str = Field(..., min_length=1, max_length=2000, description="Market data summary")
+    context: str = Field(default="general", max_length=100, description="Analysis context")
+    model: Optional[str] = Field(None, description="Optional model override")
+    webhook_url: Optional[str] = Field(None, description="Optional Discord webhook URL")
+    title: str = Field(default="AI Market Interpretation", max_length=200, description="Discord message title")

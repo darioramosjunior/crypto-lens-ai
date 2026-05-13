@@ -36,6 +36,7 @@ The project follows a **sequential data pipeline** executed by [main.py](main.py
 | [daily_fetch_and_pulse.py](daily_fetch_and_pulse.py) | Daily market summaries | OHLCV 1d data | `prices_1d.csv`, chart, Discord alert |
 | [market_breadth.py](market_breadth.py) | Market-wide sentiment metrics | `prices_1d.csv` | BTC%, BTCD%, advancing/declining counts |
 | [oi_change_screener.py](oi_change_screener.py) | Open interest anomaly detection | Binance OI endpoints | Top 20 movers, alerts on changes |
+| [ai_interpreter.py](ai_interpreter.py) | LLM-powered market interpretation | Data summaries, OpenRouter API | AI insights → Discord webhook |
 | [pipeline_observability.py](pipeline_observability.py) | Pipeline health monitoring | Log files | Error/warning summary → Discord |
 
 ## Key Conventions
@@ -185,3 +186,15 @@ if sys.platform.startswith('win'):
 2. Add custom validators: `@field_validator('field_name')` in model class
 3. Log validation failures before continuing (try-except pattern)
 4. Example: Check OHLC consistency, price ranges, timestamp ordering
+
+### Add AI-powered market interpretation
+1. Get OpenRouter API key from [openrouter.ai](https://openrouter.ai)
+2. Add to .env: `OPENROUTER_API_KEY=your_key` and `AI_INSIGHTS_WEBHOOK=discord_url`
+3. Call from pipeline: `from ai_interpreter import interpret_and_send`
+4. Example:
+   ```python
+   summary = "BTC +2.5%, ETH +1.8%, 67% coins green"
+   interpret_and_send(summary, context="hourly", title="Hourly AI Analysis")
+   ```
+5. AI interpreter runs in pipeline after market analysis, before observability
+6. See [docs/AI_INTERPRETER_GUIDE.md](docs/AI_INTERPRETER_GUIDE.md) for full docs

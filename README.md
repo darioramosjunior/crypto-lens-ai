@@ -54,6 +54,13 @@ Perfect for traders, data analysts, and crypto enthusiasts who want automated, d
   - Sends aggregated reports to Discord
   - Tracks pipeline health and performance metrics
 
+- **🤖 AI-Powered Insights** - LLM-powered market interpretation (NEW!)
+  - Integrates with OpenRouter API for access to multiple LLMs (Llama 2, Mistral, GPT-4, Claude)
+  - Automatically generates intelligent market interpretations from data summaries
+  - Sends AI-powered analysis to Discord for trader-friendly insights
+  - Supports custom prompts and model selection
+  - Optional feature with graceful degradation (works without API key)
+
 ### Data & Visualization
 - **Multiple Data Sources**
   - Binance Futures APIs (via CCXT)
@@ -92,6 +99,8 @@ Technical Analysis & Anomaly Detection
     ↓
 Visualization & Reporting
     ↓
+AI-Powered Interpretation (OpenRouter LLMs)
+    ↓
 Discord Alerts & S3 Archival
 ```
 
@@ -106,6 +115,7 @@ Discord Alerts & S3 Archival
 | `oi_change_screener.py` | Open interest monitoring | Hourly (via main.py) | OI change alerts, top 20 movers |
 | `coin_data_collector.py` | Coin metadata collection | Daily (via main.py) | Coin database CSV, market cap data |
 | `pipeline_observability.py` | Pipeline health monitoring | Hourly (via main.py) | Error/warning summaries, Discord alerts |
+| `ai_interpreter.py` | LLM-powered market interpretation | Every run (via main.py) | AI insights to Discord, intelligent analysis |
 | `discord_integrator.py` | Webhook integration | On-demand | Message/image delivery to Discord |
 | `logger.py` | Event logging system | Continuous | Structured logs with timestamps |
 | `logs_cleaner.py` | Log maintenance | Daily (separate cron) | Cleanup of logs older than retention period |
@@ -117,7 +127,8 @@ Discord Alerts & S3 Archival
 - **Technical Analysis**: Pandas-TA (RSI, Moving Averages, etc.)
 - **Data Validation**: Pydantic (runtime type validation)
 - **Market Data**: CCXT, Binance Futures API, aiohttp
-- **APIs**: CoinMarketCap, Discord Webhooks
+- **APIs**: CoinMarketCap, Discord Webhooks, OpenRouter (LLM integration)
+- **AI & LLMs**: OpenRouter API for access to Llama 2, Mistral, GPT-4, Claude, and more
 - **Visualization**: Matplotlib, Kaleido (chart export)
 - **Cloud Storage**: AWS S3 (boto3)
 - **Async Processing**: Python asyncio
@@ -157,6 +168,7 @@ Key packages:
 - API Keys (optional but recommended):
   - **CoinMarketCap API Key** - For market cap data
   - **Discord Webhook URL** - For alerts
+  - **OpenRouter API Key** - For AI-powered insights (optional)
   - **AWS Credentials** - For S3 storage
 
 ### Installation
@@ -186,6 +198,11 @@ Key packages:
    DAILY_PULSE_WEBHOOK=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
    OI_SCREENER_WEBHOOK=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
    
+   # AI-Powered Insights (OpenRouter)
+   OPENROUTER_API_KEY=sk-or-v1-YOUR_OPENROUTER_API_KEY
+   AI_INSIGHTS_WEBHOOK=https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+   OPENROUTER_MODEL=meta-llama/llama-2-70b-chat  # Optional, defaults to Llama 2
+   
    # CoinMarketCap API
    cmc_api_key=YOUR_CMC_API_KEY
    
@@ -201,6 +218,19 @@ Key packages:
    - Cron schedules for automated runs
    - Data retention policies
 
+6. **Configure AI Model (Optional)**
+   The AI interpreter supports multiple LLM models via OpenRouter:
+   ```env
+   # Available models and approximate costs (per 1M tokens):
+   OPENROUTER_MODEL=meta-llama/llama-2-70b-chat      # Free tier, recommended
+   # OPENROUTER_MODEL=mistralai/mistral-7b-instruct   # ~$0.15
+   # OPENROUTER_MODEL=openai/gpt-3.5-turbo            # ~$0.50
+   # OPENROUTER_MODEL=openai/gpt-4                    # ~$15.00
+   # OPENROUTER_MODEL=anthropic/claude-2              # ~$8.00
+   ```
+   
+   See [docs/AI_INTERPRETER_GUIDE.md](docs/AI_INTERPRETER_GUIDE.md) for full model list and performance comparisons.
+
 ### Running the Application
 
 **Manual execution:**
@@ -214,6 +244,7 @@ python hourly_fetch_and_pulse.py
 python daily_fetch_and_pulse.py
 python oi_change_screener.py
 python coin_data_collector.py
+python ai_interpreter.py      # Requires OPENROUTER_API_KEY in .env
 ```
 
 **Automated execution (Linux/Unix - Recommended):**
@@ -466,6 +497,15 @@ logs_cleaner_cron_sched = 0 15 * * *
 4. Generates summary report of latest run
 5. Sends observability alerts to Discord webhook
 
+### AI-Powered Market Interpretation ✨
+1. Collects market data summaries from all pipeline components
+2. Calls OpenRouter API to generate intelligent market insights
+3. Leverages multiple LLMs (Llama 2, Mistral, GPT-4, Claude, etc.)
+4. Interprets trends, identifies opportunities, and assesses risks
+5. Sends AI-generated analysis to Discord with trader-friendly language
+6. Logs all interpretations for audit trail and model performance tracking
+7. Gracefully continues if API unavailable (optional feature)
+
 ## 📈 Use Cases
 
 - **Momentum Trading** - Real-time alerts on trend shifts and OI changes
@@ -567,6 +607,8 @@ Typical execution times:
 - [Pandas-TA Technical Analysis](https://github.com/twopirllc/pandas-ta)
 - [Discord Webhook Integration](https://discord.com/developers/docs/resources/webhook)
 - [Grafana Documentation](https://grafana.com/docs/)
+- [OpenRouter API Documentation](https://openrouter.io/docs) - For AI-powered insights
+- **AI Interpreter Guide**: See [docs/AI_INTERPRETER_GUIDE.md](docs/AI_INTERPRETER_GUIDE.md) for setup, configuration, and advanced usage
 
 ## 📄 License
 
@@ -583,6 +625,7 @@ This project demonstrates:
 - ✅ Cloud data storage (AWS S3)
 - ✅ Automated alerting systems
 - ✅ Data visualization and dashboarding (Matplotlib, Grafana)
+- ✅ AI/LLM integration (OpenRouter API for intelligent market analysis)
 - ✅ Production-grade logging and error handling
 - ✅ Scheduled task orchestration
 - ✅ Regex and financial data processing
@@ -592,7 +635,7 @@ This project demonstrates:
 - ✅ Shared utility libraries and code organization
 - ✅ CI/CD pipeline integration (GitHub Actions)
 
-Perfect portfolio project showcasing full-stack data engineering capabilities with production best practices.
+Perfect portfolio project showcasing full-stack data engineering capabilities with production best practices and AI integration.
 
 ---
 
